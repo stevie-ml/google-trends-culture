@@ -349,7 +349,7 @@ class GoogleTrendsCollector:
         # Topic to factor mapping (approximations)
         # Factor indices: [urban, south, coastal, conservative]
         topic_factors = {
-            # Music
+            # Music - expanded
             'country music': [-0.3, 0.6, -0.3, 0.7],
             'hip hop': [0.7, 0.3, 0.3, -0.2],
             'rock music': [0.1, -0.1, 0.0, 0.1],
@@ -358,15 +358,30 @@ class GoogleTrendsCollector:
             'k-pop': [0.7, -0.1, 0.6, -0.3],
             'gospel music': [-0.1, 0.8, 0.0, 0.6],
             'electronic music': [0.8, -0.2, 0.5, -0.4],
+            'R&B music': [0.6, 0.4, 0.3, -0.1],
+            'bluegrass': [-0.5, 0.7, -0.4, 0.6],
+            'indie music': [0.7, -0.3, 0.5, -0.5],
+            'latin music': [0.5, 0.6, 0.6, -0.2],
+            'punk rock': [0.6, -0.2, 0.4, -0.3],
+            'classical music': [0.5, -0.2, 0.3, -0.2],
+            'Taylor Swift': [0.3, 0.0, 0.2, -0.1],
+            'Drake': [0.7, 0.2, 0.4, -0.3],
+            'Morgan Wallen': [-0.3, 0.7, -0.3, 0.6],
+            'Bad Bunny': [0.6, 0.5, 0.7, -0.3],
+            'Beyonce': [0.6, 0.3, 0.3, -0.2],
+            'Luke Combs': [-0.3, 0.7, -0.3, 0.6],
 
-            # Slang
+            # Slang - expanded
             "y'all": [-0.2, 0.9, 0.1, 0.5],
             'hella': [0.3, -0.3, 0.8, -0.4],
             'wicked': [0.2, -0.9, 0.6, -0.3],
             'pop vs soda': [0.0, -0.3, 0.0, 0.1],
             'fixin to': [-0.3, 0.9, -0.2, 0.6],
+            'bubbler water fountain': [0.0, -0.7, 0.0, 0.0],
+            'hoagie sub sandwich': [0.3, -0.5, 0.5, -0.1],
+            'sneakers tennis shoes': [0.2, -0.3, 0.3, -0.1],
 
-            # Food
+            # Food - expanded
             'sweet tea': [-0.2, 0.9, 0.2, 0.5],
             'craft beer': [0.6, -0.3, 0.4, -0.4],
             'boba tea': [0.8, -0.1, 0.7, -0.5],
@@ -374,8 +389,15 @@ class GoogleTrendsCollector:
             'barbecue': [0.0, 0.6, -0.2, 0.4],
             'vegan food': [0.8, -0.2, 0.6, -0.7],
             'soul food': [0.3, 0.7, 0.2, 0.1],
+            'tex mex': [0.2, 0.7, 0.0, 0.3],
+            'lobster roll': [0.3, -0.9, 0.8, -0.2],
+            'deep dish pizza': [0.5, -0.4, -0.2, 0.0],
+            'In-N-Out burger': [0.4, 0.1, 0.9, -0.2],
+            'Whataburger': [0.1, 0.8, 0.0, 0.4],
+            'Dunkin Donuts': [0.4, -0.7, 0.6, -0.1],
+            'Waffle House': [0.0, 0.9, 0.2, 0.4],
 
-            # Sports
+            # Sports - expanded
             'NFL football': [0.1, 0.2, 0.0, 0.2],
             'college football': [-0.1, 0.7, -0.1, 0.5],
             'NBA basketball': [0.5, 0.2, 0.2, -0.1],
@@ -384,8 +406,12 @@ class GoogleTrendsCollector:
             'rodeo': [-0.5, 0.5, -0.5, 0.8],
             'surfing': [0.4, 0.2, 1.0, -0.2],
             'skiing': [0.3, -0.6, 0.3, 0.0],
+            'NASCAR': [-0.2, 0.7, 0.1, 0.6],
+            'fishing license': [-0.4, 0.3, 0.2, 0.4],
+            'golf courses': [0.2, 0.2, 0.3, 0.2],
+            'hiking trails': [0.3, -0.3, 0.4, -0.2],
 
-            # Lifestyle
+            # Lifestyle - expanded
             'church near me': [-0.2, 0.6, -0.1, 0.7],
             'yoga classes': [0.7, -0.1, 0.5, -0.6],
             'gun range': [-0.3, 0.4, -0.4, 0.8],
@@ -393,18 +419,41 @@ class GoogleTrendsCollector:
             'camping gear': [-0.1, -0.2, -0.2, 0.2],
             'beach vacation': [0.3, 0.3, 0.8, 0.0],
             'hunting license': [-0.6, 0.3, -0.5, 0.8],
+            'CrossFit gym': [0.5, 0.0, 0.3, 0.1],
+            'meditation app': [0.7, -0.2, 0.5, -0.5],
+            'book club': [0.4, -0.2, 0.3, -0.3],
+            'wine tasting': [0.5, -0.1, 0.6, -0.3],
+            'brewery tour': [0.5, -0.3, 0.4, -0.3],
 
-            # Media
+            # Media - expanded
             'Fox News': [-0.2, 0.3, -0.2, 0.9],
+            'CNN': [0.5, 0.0, 0.3, -0.5],
+            'MSNBC': [0.6, -0.2, 0.4, -0.7],
             'NPR': [0.7, -0.3, 0.4, -0.8],
             'Joe Rogan': [0.2, 0.1, 0.1, 0.3],
             'true crime podcast': [0.4, -0.1, 0.2, -0.1],
             'reality TV': [0.1, 0.2, 0.1, 0.0],
-
-            # Political
-            'voter registration': [0.3, 0.1, 0.1, -0.1],
+            'New York Times': [0.8, -0.3, 0.5, -0.7],
+            'Wall Street Journal': [0.6, -0.1, 0.4, 0.2],
             'local news': [0.0, 0.0, 0.0, 0.0],
+            'talk radio': [-0.2, 0.3, -0.2, 0.6],
+            'podcast app': [0.6, -0.2, 0.4, -0.3],
+
+            # Political - expanded
+            'voter registration': [0.3, 0.1, 0.1, -0.1],
+            'town hall meeting': [-0.1, 0.0, -0.1, 0.1],
+            'school board meeting': [-0.1, 0.1, -0.1, 0.2],
             'community events': [0.1, -0.1, 0.0, -0.1],
+            'local election': [0.0, 0.0, 0.0, 0.0],
+            'city council': [0.2, 0.0, 0.1, 0.0],
+            'property tax': [0.1, 0.0, 0.0, 0.1],
+            'zoning laws': [0.3, -0.1, 0.2, 0.0],
+            'gun laws': [0.2, 0.0, 0.1, 0.3],
+            'immigration policy': [0.3, 0.2, 0.3, 0.1],
+            'climate change': [0.6, -0.2, 0.4, -0.6],
+            'minimum wage': [0.4, 0.1, 0.2, -0.3],
+            'healthcare costs': [0.2, 0.1, 0.1, 0.0],
+            'student loans': [0.5, 0.0, 0.3, -0.2],
         }
 
         # Assign loadings

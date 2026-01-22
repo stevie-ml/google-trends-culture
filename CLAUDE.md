@@ -12,14 +12,17 @@ This repository implements an **empirical social science analysis** that uses Go
 google-trends-culture/
 ├── src/                      # Core analysis modules
 │   ├── __init__.py          # Package documentation with mathematical framework
-│   ├── config.py            # Configuration and geographic data
+│   ├── config.py            # Configuration, topics, and geographic data
 │   ├── data_collection.py   # Google Trends API + mock data generation
 │   ├── preprocessing.py     # Normalization and data cleaning
 │   ├── similarity.py        # Similarity matrix computation
 │   ├── spectral_analysis.py # PCA / eigenvalue decomposition
 │   ├── clustering.py        # GMM, spectral, K-means clustering
-│   └── visualization.py     # Plotting functions
-├── run_analysis.py          # Main analysis pipeline
+│   ├── visualization.py     # Plotting functions (scree, embeddings, heatmaps)
+│   ├── geo_visualization.py # Geographic choropleth maps (state/metro)
+│   └── interactive.py       # Interactive analysis runner with presets
+├── run_analysis.py          # Full analysis pipeline
+├── run_interactive.py       # Interactive analysis with topic filtering
 ├── requirements.txt         # Python dependencies
 ├── data/                    # Data storage (created at runtime)
 ├── outputs/                 # Generated figures and results
@@ -56,7 +59,7 @@ google-trends-culture/
 # Install dependencies
 pip install -r requirements.txt
 
-# Run with mock data (default)
+# Run full analysis with mock data (default)
 python run_analysis.py
 
 # Run with real Google Trends API
@@ -65,6 +68,42 @@ python run_analysis.py --real-data
 # Specify clustering parameters
 python run_analysis.py --n-clusters 5 --clustering gmm
 ```
+
+## Interactive Analysis (Topic Filtering)
+
+Use `run_interactive.py` to explore different topic categories and cluster configurations:
+
+```bash
+# Analyze music topics only
+python run_interactive.py --topics music --clusters 5
+
+# Analyze political topics only
+python run_interactive.py --topics politics --clusters 4
+
+# Analyze general culture (slang, food, lifestyle)
+python run_interactive.py --topics culture
+
+# Analyze everything together
+python run_interactive.py --topics all --clusters 6
+
+# Compare all topic presets side-by-side
+python run_interactive.py --compare-all --clusters 5
+
+# Show geographic maps (requires geopandas)
+python run_interactive.py --topics all --show-map
+
+# Use metro areas instead of states
+python run_interactive.py --topics music --geo metro
+```
+
+### Topic Presets
+
+| Preset | Categories Included |
+|--------|---------------------|
+| `music` | Music genres, artists (country, hip-hop, k-pop, etc.) |
+| `politics` | Political topics + media consumption (news sources) |
+| `culture` | Slang, food, lifestyle |
+| `all` | All categories combined |
 
 ## Key Modules
 

@@ -105,8 +105,16 @@ MAJOR_METROS = {
 # - Food and lifestyle
 # - Sports preferences
 
+# TOPIC CATEGORY PRESETS for easy analysis switching
+TOPIC_PRESETS = {
+    'music': ['music'],
+    'politics': ['political', 'media'],
+    'culture': ['slang', 'food', 'lifestyle'],
+    'all': ['music', 'slang', 'food', 'sports', 'lifestyle', 'media', 'political'],
+}
+
 DEFAULT_TOPICS = {
-    # Music genres and artists (cultural taste)
+    # Music genres and artists (cultural taste) - EXPANDED
     'music': [
         'country music',
         'hip hop',
@@ -116,6 +124,18 @@ DEFAULT_TOPICS = {
         'k-pop',
         'gospel music',
         'electronic music',
+        'R&B music',
+        'bluegrass',
+        'indie music',
+        'latin music',
+        'punk rock',
+        'classical music',
+        'Taylor Swift',
+        'Drake',
+        'Morgan Wallen',
+        'Bad Bunny',
+        'Beyonce',
+        'Luke Combs',
     ],
 
     # Regional slang and expressions
@@ -125,6 +145,9 @@ DEFAULT_TOPICS = {
         'wicked',
         'pop vs soda',
         'fixin to',
+        'bubbler water fountain',
+        'hoagie sub sandwich',
+        'sneakers tennis shoes',
     ],
 
     # Food and drink preferences
@@ -136,6 +159,13 @@ DEFAULT_TOPICS = {
         'barbecue',
         'vegan food',
         'soul food',
+        'tex mex',
+        'lobster roll',
+        'deep dish pizza',
+        'In-N-Out burger',
+        'Whataburger',
+        'Dunkin Donuts',
+        'Waffle House',
     ],
 
     # Sports and recreation
@@ -148,6 +178,10 @@ DEFAULT_TOPICS = {
         'rodeo',
         'surfing',
         'skiing',
+        'NASCAR',
+        'fishing license',
+        'golf courses',
+        'hiking trails',
     ],
 
     # Lifestyle and values
@@ -159,22 +193,45 @@ DEFAULT_TOPICS = {
         'camping gear',
         'beach vacation',
         'hunting license',
+        'CrossFit gym',
+        'meditation app',
+        'book club',
+        'wine tasting',
+        'brewery tour',
     ],
 
-    # Pop culture and media
+    # Pop culture and media - EXPANDED for political/media analysis
     'media': [
         'Fox News',
+        'CNN',
+        'MSNBC',
         'NPR',
         'Joe Rogan',
         'true crime podcast',
         'reality TV',
+        'New York Times',
+        'Wall Street Journal',
+        'local news',
+        'talk radio',
+        'podcast app',
     ],
 
-    # Political and social (handled carefully for research purposes)
+    # Political and social - EXPANDED
     'political': [
         'voter registration',
-        'local news',
+        'town hall meeting',
+        'school board meeting',
         'community events',
+        'local election',
+        'city council',
+        'property tax',
+        'zoning laws',
+        'gun laws',
+        'immigration policy',
+        'climate change',
+        'minimum wage',
+        'healthcare costs',
+        'student loans',
     ],
 }
 
@@ -203,9 +260,15 @@ class AnalysisConfig:
     timeframe: str = 'today 12-m'
 
     # Topic categories to include (keys from DEFAULT_TOPICS)
+    # Can use preset names: 'music', 'politics', 'culture', 'all'
+    # Or specific categories: ['music', 'food', 'lifestyle']
     topic_categories: List[str] = field(default_factory=lambda: [
         'music', 'slang', 'food', 'sports', 'lifestyle', 'media'
     ])
+
+    # Topic preset for easy switching (overrides topic_categories if set)
+    # Options: 'music', 'politics', 'culture', 'all', or None
+    topic_preset: Optional[str] = None
 
     # Rate limiting for API calls (seconds between requests)
     api_delay: float = 1.0
@@ -289,11 +352,22 @@ class AnalysisConfig:
 
     def get_topics(self) -> List[str]:
         """Return flat list of all topics from selected categories."""
+        # Check if using a preset
+        categories = self.topic_categories
+        if self.topic_preset is not None and self.topic_preset in TOPIC_PRESETS:
+            categories = TOPIC_PRESETS[self.topic_preset]
+
         topics = []
-        for category in self.topic_categories:
+        for category in categories:
             if category in DEFAULT_TOPICS:
                 topics.extend(DEFAULT_TOPICS[category])
         return topics
+
+    def get_active_categories(self) -> List[str]:
+        """Return the list of active topic categories."""
+        if self.topic_preset is not None and self.topic_preset in TOPIC_PRESETS:
+            return TOPIC_PRESETS[self.topic_preset]
+        return self.topic_categories
 
     def get_regions(self) -> List[str]:
         """Return list of regions based on geo_unit setting."""
