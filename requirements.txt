@@ -1,0 +1,29 @@
+# Google Trends Cultural Similarity Analysis
+# Core dependencies for empirical social science research
+
+# Data collection
+pytrends>=4.9.0
+
+# Scientific computing
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.11.0
+
+# Machine learning / statistical analysis
+scikit-learn>=1.3.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
+
+# Geographic visualization (optional)
+geopandas>=0.13.0
+folium>=0.14.0
+
+# Progress bars and utilities
+tqdm>=4.65.0
+
+# Jupyter support (optional)
+jupyter>=1.0.0
+ipykernel>=6.0.0
