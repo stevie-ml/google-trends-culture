@@ -17,20 +17,88 @@ def get_db_path():
 
 
 def extract_text_from_blob(blob):
-    """Extract text from attributedBody blob."""
+    """Extract text from attributedBody blob (NSAttributedString format)."""
     if not blob:
         return None
     try:
-        matches = re.findall(b'[\x20-\x7e]{5,}', blob)
-        if matches:
-            # Filter out common artifacts
-            for match in reversed(matches):
-                text = match.decode('utf-8', errors='ignore').strip()
-                if not text.startswith(('NSMutable', 'NSString', 'streamtyped', '+[')):
+        # The attributedBody is a serialized NSAttributedString
+        # The actual text is usually after "NSString" marker and before control chars
+
+        # Method 1: Look for text between specific markers
+        # NSAttributedString stores text early in the blob
+        text_start = blob.find(b'\x01+')
+        if text_start != -1:
+            # Find the length byte and extract text
+            chunk = blob[text_start+2:text_start+500]
+            # Find printable ASCII sequence
+            match = re.search(b'^[\x20-\x7e\xc0-\xff]+', chunk)
+            if match:
+                text = match.group().decode('utf-8', errors='ignore').strip()
+                if is_valid_message(text):
                     return text
-    except:
+
+        # Method 2: Look after streamtyped marker
+        marker = b'streamtyped'
+        idx = blob.find(marker)
+        if idx != -1:
+            chunk = blob[idx+len(marker):idx+600]
+            # Skip past the header bytes and find readable text
+            matches = re.findall(b'[\x20-\x7e]{3,200}', chunk)
+            for m in matches:
+                text = m.decode('utf-8', errors='ignore').strip()
+                if is_valid_message(text):
+                    return text
+
+        # Method 3: Scan for longest readable sequence that looks like a message
+        matches = re.findall(b'[\x20-\x7e]{5,300}', blob)
+        valid_matches = []
+        for m in matches:
+            text = m.decode('utf-8', errors='ignore').strip()
+            if is_valid_message(text):
+                valid_matches.append(text)
+
+        if valid_matches:
+            # Return the longest valid match
+            return max(valid_matches, key=len)
+
+    except Exception as e:
         pass
     return None
+
+
+def is_valid_message(text):
+    """Check if extracted text looks like a real message vs garbage."""
+    if not text or len(text) < 2:
+        return False
+
+    # Skip known garbage patterns
+    garbage_patterns = [
+        r'^NS[A-Z]',           # NSString, NSValue, etc.
+        r'^streamtyped',
+        r'^\+\[',              # Objective-C method signatures
+        r'^@"',
+        r'^[\da-f]{8}-[\da-f]{4}',  # UUIDs
+        r'^\)at_',             # Weird artifacts
+        r'^Mat_',
+        r'^[\x00-\x1f]',       # Control characters
+        r'^bplist',            # Binary plist header
+        r'^typedstream',
+    ]
+
+    for pattern in garbage_patterns:
+        if re.match(pattern, text, re.IGNORECASE):
+            return False
+
+    # Should have at least some letters
+    if not re.search(r'[a-zA-Z]', text):
+        return False
+
+    # Ratio of alphanumeric to total should be reasonable
+    alnum = sum(1 for c in text if c.isalnum() or c.isspace())
+    if alnum / len(text) < 0.5:
+        return False
+
+    return True
 
 
 def find_chat_id(db_path, phone):
